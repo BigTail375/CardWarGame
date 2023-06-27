@@ -354,5 +354,5 @@ class WarGame(Game):
         pygame.quit()
 
 if __name__ == "__main__":
-    game = WarGame(800, 600)
+    game = WarGame(1200, 600)
     game.run()
