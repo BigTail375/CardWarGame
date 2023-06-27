@@ -38,7 +38,7 @@ class Deck:
                 self.cards.append(Card(suit, value))
 
     def shuffle(self):
-        random.shuffle(self.cards)
+        #random.shuffle(self.cards)
         for card in self.cards:  # Ensure all cards are face up after shuffling
             card.face_up = True
 
@@ -57,8 +57,6 @@ class Player:
     def play_card(self, face_up=True):
         if self.hand:
             card = self.hand.pop()
-            if card == None:
-                return None
             card.face_up = face_up  # specify whether the card is face up or face down
             if not self.hand and self.won_cards:  # reshuffle won cards if hand is empty
                 print("Reshuffling cards!")
@@ -96,8 +94,6 @@ class WarGame(Game):
         self.war = False
         self.war_cards = []
         self.total_cards_played = 0  # Initialize total cards played
-        self.player1_win = False
-        self.player2_win = False
         
         # Create a font
         self.font = self.makeFont('Arial', 20)
@@ -179,33 +175,10 @@ class WarGame(Game):
         self.room.addObject(self.player1_remaining_text)
         self.room.addObject(self.player2_remaining_text)
 
-    def set_winner(self):
-        self.war = False
-        if self.player1_win == True:
-            self.player1.won_cards = [None] * len(self.player1.won_cards)
-            self.player1.hand = [None] * (52 - len(self.player1.won_cards))
-            self.player2.won_cards = []
-            self.player2.won_cards = []
-            self.draw_cards(False)
-        if self.player2_win == True:
-            self.player2.won_cards = [None] * len(self.player1.won_cards)
-            self.player2.hand = [None] * (52 - len(self.player1.won_cards))
-            self.player1.won_cards = []
-            self.player1.won_cards = []
-            self.draw_cards(False)
-
     def play_round(self):
         if not self.turn_over:
             card1 = self.player1.play_card()
             card2 = self.player2.play_card()
-            if card1 == None:
-                self.player1_win = False
-                self.player2_win = True
-                return
-            elif card2 == None:
-                self.player1_win = True
-                self.player2_win = False
-                return
             draw_new = True
             if card1 and card2:  # if both players have cards to play
                 self.cards_in_play.extend([card1, card2])
@@ -358,27 +331,20 @@ class WarGame(Game):
         win_text = TextRectangle(f'{self.player1.name} is the winner!', self.windowWidth // 2 - 150 , self.windowHeight // 2 - 10, font, (255, 0, 0))
         win_text.rect.center = (self.windowWidth // 2, self.windowHeight // 2)
         #self.room.addObject(win_text)
-        winner = False
         while self.running:
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
                     self.running = False
-                elif winner == True:
-                    pass
                 elif e.type == pygame.MOUSEBUTTONDOWN:
                     self.play_round()
-                    if len(self.player1.won_cards) + len(self.player1.hand) == 52 or self.player1_win:
+                    if len(self.player1.won_cards) + len(self.player1.hand) == 52:
                         print(f"{self.player1.name} is the winner!")
-                        self.set_winner()
                         win_text.setText(f"{self.player1.name} is the winner!")
                         self.room.addObject(win_text)
-                        winner = True
-                    elif len(self.player2.won_cards) + len(self.player2.hand) == 52 or self.player2_win:
+                    elif len(self.player2.won_cards) + len(self.player2.hand) == 52:
                         print(f"{self.player2.name} is the winner!")
-                        self.set_winner()
                         win_text.setText(f"{self.player2.name} is the winner!")
                         self.room.addObject(win_text)
-                        winner = True
                     
             self.room.updateObjects()
             self.room.renderBackground(self)
